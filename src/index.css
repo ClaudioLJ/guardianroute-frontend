@@ -1,0 +1,47 @@
+:root {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  color: #111827;
+  background-color: #ffffff;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Que todo use box-sizing borde */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* Que la app ocupe toda la pantalla */
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+/* Fondo blanco general, sin centrar nada */
+body {
+  background-color: #ffffff;
+}
+
+/* Estilos básicos opcionales para links y botones */
+a {
+  font-weight: 500;
+  color: #00b388;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+button {
+  font-family: inherit;
+}

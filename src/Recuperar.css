@@ -1,0 +1,210 @@
+.recovery-container {
+  position: relative;
+  min-height: 100vh;
+  width: 100%;
+  background: #05040a;
+  color: #f9fafb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+}
+
+/* Logo flotante arriba, independiente del contenido */
+.recovery-header {
+  position: absolute;
+  top: 9%;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 3;
+}
+
+.recovery-logo {
+  height: 180px;
+  object-fit: contain;
+}
+
+/* Contenedor central (card) */
+.recovery-inner {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 420px;
+  padding: 3rem 1.75rem 2.5rem;
+  text-align: center;
+  /* lo subimos un poquito para que no quede tan abajo */
+  margin-top: 1.5rem;
+}
+
+/* Tarjeta */
+.recovery-card {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.recovery-title {
+  font-size: 1.6rem;
+  font-weight: 700;
+}
+
+/* Formulario */
+.recovery-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.recovery-input {
+  width: 100%;
+  padding: 0.85rem 0.9rem;
+  border-radius: 8px;
+  border: none;
+  outline: none;
+  background-color: #18181b;
+  color: #f9fafb;
+  font-size: 0.95rem;
+}
+
+.recovery-input::placeholder {
+  color: #9ca3af;
+}
+
+.recovery-button {
+  margin-top: 0.2rem;
+  width: 100%;
+  padding: 0.9rem;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 600;
+  background: #5b3df6;
+  color: #ffffff;
+  transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.15s ease;
+}
+
+.recovery-button:hover {
+  background: #4c32d6;
+  box-shadow: 0 10px 25px rgba(91, 61, 246, 0.35);
+  transform: translateY(-1px);
+}
+
+.recovery-button:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+/* Texto "volver a iniciar sesión" */
+.recovery-back {
+  margin-top: 0.75rem;
+  font-size: 0.85rem;
+}
+
+/* Accesibilidad: label oculto visualmente */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Camino punteado de fondo */
+.recovery-path {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Curva superior izquierda */
+.recovery-path::before {
+  content: "";
+  position: absolute;
+  left: -140px;
+  top: -40px;
+  width: 72%;
+  height: 125%;
+  border: 3px dashed #d1c4ff;
+  border-right-color: transparent;
+  border-bottom-color: transparent;
+  border-radius: 70% 0 0 80%;
+  opacity: 0.7;
+}
+
+/* Línea inferior con ligera inclinación */
+.recovery-path::after {
+  content: "";
+  position: absolute;
+  left: -40px;
+  bottom: 60px;
+  width: 115%;
+  border-bottom: 3px dashed #d1c4ff;
+  transform: rotate(-3deg);
+  opacity: 0.7;
+}
+
+/* Pin de ubicación */
+.recovery-pin {
+  position: absolute;
+  right: 5%;
+  bottom: 8%;
+  width: 120px; /* tamaño más grande */
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+
+.recovery-pin-img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Botón estilo link (reutilizable) */
+.link-button {
+  border: none;
+  background: none;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  color: #5b3df6;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.link-button:hover {
+  text-decoration: underline;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .recovery-logo {
+    height: 90px;
+  }
+
+  .recovery-inner {
+    padding: 2.5rem 1.25rem 2rem;
+    margin-top: 0.5rem;
+  }
+
+  .recovery-title {
+    font-size: 1.3rem;
+  }
+
+  .recovery-pin {
+    width: 90px;
+    height: 90px;
+    right: 3%;
+    bottom: 6%;
+  }
+}
