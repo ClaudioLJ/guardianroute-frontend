@@ -3,17 +3,18 @@ import React, { useState, useEffect } from "react";
 import Registro from "./Registro.jsx";
 import Login from "./Login.jsx";
 import Recuperar from "./Recuperar.jsx";
-import Menu from "./Menu.jsx"; // asegúrate de tener este componente creado
+import Menu from "./Menu.jsx";
+import Terminos from "./Terminos.jsx";
 
 export default function App() {
-  const [vista, setVista] = useState("login"); // "registro" | "login" | "recuperar" | "menu"
+  const [vista, setVista] = useState("login"); // "registro" | "login" | "recuperar" | "menu" | "terminos"
 
   const irARegistro = () => setVista("registro");
   const irALogin = () => setVista("login");
   const irARecuperar = () => setVista("recuperar");
   const irAMenu = () => setVista("menu");
+  const irATerminos = () => setVista("terminos");
 
-  // NUEVO: al cargar la app, revisar si hay token para quedarse en el menú
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
@@ -36,7 +37,11 @@ export default function App() {
   }
 
   if (vista === "registro") {
-    return <Registro onGoToLogin={irALogin} />;
+    return <Registro onGoToLogin={irALogin} onGoToTerms={irATerminos} />;
+  }
+
+  if (vista === "terminos") {
+    return <Terminos onGoBack={irARegistro} onGoToLogin={irALogin} />;
   }
 
   if (vista === "menu") {

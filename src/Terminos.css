@@ -1,0 +1,86 @@
+.terms-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #03112b 0%, #061a45 55%, #0a255f 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 28px;
+  position: relative;
+  font-family: "Roboto", system-ui, sans-serif;
+}
+
+.terms-page-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.18);
+}
+
+.terms-page-card {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 980px;
+  max-height: 88vh;
+  overflow: hidden;
+  background: #ffffff;
+  border-radius: 24px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+}
+
+.terms-page-header {
+  padding: 28px 30px 16px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.terms-page-logo {
+  height: 72px;
+  object-fit: contain;
+  margin-bottom: 12px;
+}
+
+.terms-page-header h1 {
+  margin: 0 0 10px;
+  color: #0f172a;
+  font-size: 1.9rem;
+}
+
+.terms-page-header p {
+  margin: 0;
+  color: #475569;
+  line-height: 1.55;
+}
+
+.terms-page-content {
+  padding: 22px 30px;
+  overflow-y: auto;
+}
+
+.terms-page-content p {
+  margin: 0 0 14px;
+  color: #1f2937;
+  line-height: 1.65;
+  font-size: 0.96rem;
+}
+
+.terms-page-actions {
+  padding: 18px 30px 26px;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.terms-page-back {
+  border: none;
+  background: #00b388;
+  color: #fff;
+  padding: 12px 18px;
+  border-radius: 999px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.terms-page-back:hover {
+  background: #009673;
+}

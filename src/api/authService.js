@@ -44,20 +44,9 @@ export async function resetPassword({ correo, code, newPwd }) {
   const cleanPwd = String(newPwd ?? "").trim();
 
   const body = {
-    // email
     correo: cleanCorreo,
-    email: cleanCorreo,
-
-    // code/token (todas las variantes)
-    code: cleanCode,
     codigo: cleanCode,
-    token: cleanCode,
-
-    // password (todas las variantes)
     newPwd: cleanPwd,
-    pwd: cleanPwd,
-    password: cleanPwd,
-    newPassword: cleanPwd,
   };
 
   console.log("✅ resetPassword enviando body:", body);

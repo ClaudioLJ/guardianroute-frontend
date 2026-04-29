@@ -4,7 +4,6 @@ import "./Login.css";
 import loginImage from "/Imagenes/Login.jpeg";
 import logoImage from "/Imagenes/Logo-Fondos-Oscuros.png";
 
-// 👇 nueva importación: usamos la capa de servicios
 import { login as apiLogin } from "./api/authService";
 
 export default function Login({

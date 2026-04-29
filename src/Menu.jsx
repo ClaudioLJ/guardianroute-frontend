@@ -1,3 +1,4 @@
+/*menu*/
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import "./Menu.css";
 import logoDark from "/Imagenes/Logo-Fondos-Oscuros.png";
@@ -24,7 +25,10 @@ import {
   updateIncidenciaAdmin,
   deleteIncidenciaAdmin,
 } from "./api/incidenciasService";
-import { createInstitucionAdmin } from "./api/institucionesService";
+import {
+  createInstitucionAdmin,
+  deleteMapCompletely,
+} from "./api/institucionesService";
 
 const DRILL_ENDPOINT =
   "https://u0odar8a7d.execute-api.us-east-1.amazonaws.com/Prod/handleDrill";
@@ -818,10 +822,77 @@ ${msg}`,
     await loadMapDetail(record);
   };
 
-  const handleDeleteLocalRecord = () => {
-    alert(
-      "Esta opción ya no debe usarse como fuente oficial. Los mapas ahora deben gestionarse desde backend.",
+  const handleDeleteLocalRecord = async () => {
+    if (!selectedRecord) {
+      alert("Primero selecciona un mapa.");
+      return;
+    }
+
+    const imageKey = String(selectedRecord.key || "").trim();
+
+    if (!imageKey) {
+      alert("El mapa seleccionado no tiene image_key.");
+      return;
+    }
+
+    const confirmed = window.confirm(
+      `¿Seguro que deseas eliminar el mapa "${selectedRecord.nombre}"?\n\nEsto borrará el registro de la DB y la imagen en S3.`,
     );
+
+    if (!confirmed) return;
+
+    try {
+      await deleteMapCompletely(imageKey);
+
+      const wasCurrentMap = currentMapKey === imageKey;
+
+      const refreshed = await loadAdminMaps();
+
+      if (wasCurrentMap) {
+        setCurrentMapUrl(defaultMapImage);
+        setCurrentMapKey("");
+        setCurrentMapFileName("");
+        setCurrentMapLabel("Mapa principal");
+      }
+
+      if (!refreshed || refreshed.length === 0) {
+        setSelectedRecordId("");
+        setSelectedMapDetail(null);
+        setBeacons([]);
+        return;
+      }
+
+      const stillExists = refreshed.find(
+        (item) => item.id === selectedRecordId,
+      );
+
+      if (!stillExists) {
+        const fallback = refreshed[0];
+        setSelectedRecordId(fallback.id);
+        setCurrentMapKey(fallback.key || "");
+        setCurrentMapFileName("");
+        setCurrentMapLabel(fallback.nombre || "Mapa principal");
+
+        const freshUrl = fallback.key
+          ? await getImageUrlFromKey(fallback.key)
+          : null;
+        setCurrentMapUrl(freshUrl || defaultMapImage);
+
+        await loadMapDetail(fallback);
+      }
+
+      alert("Mapa eliminado correctamente de la DB y de S3.");
+    } catch (error) {
+      console.error("Error eliminando mapa:", error);
+      alert(
+        `No se pudo eliminar el mapa:\n${
+          error?.response?.data?.message ||
+          error?.response?.data?.error ||
+          error?.message ||
+          "Error desconocido"
+        }`,
+      );
+    }
   };
 
   const handleImageClickForBeacon = (e) => {
@@ -1349,9 +1420,13 @@ ${msg}`);
                 <button
                   type="button"
                   onClick={handleDeleteLocalRecord}
-                  style={secondaryActionStyle}
+                  style={{
+                    ...secondaryActionStyle,
+                    border: "1px solid rgba(255, 99, 99, 0.45)",
+                    color: "#ffb3b3",
+                  }}
                 >
-                  Gestión local deshabilitada
+                  Eliminar mapa
                 </button>
               </div>
 
