@@ -36,7 +36,6 @@ export default function Registro({ onGoToLogin, onGoToTerms }) {
     }
 
     console.log("Datos del formulario:", form);
-
     alert("Registro validado correctamente.");
   };
 

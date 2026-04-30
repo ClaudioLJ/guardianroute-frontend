@@ -1,52 +1,82 @@
 // src/App.jsx
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
+import { Navigate, Route, Routes, useNavigate } from "react-router-dom";
 import Registro from "./Registro.jsx";
 import Login from "./Login.jsx";
 import Recuperar from "./Recuperar.jsx";
 import Menu from "./Menu.jsx";
 import Terminos from "./Terminos.jsx";
 
+function LoginPage() {
+  const navigate = useNavigate();
+
+  return (
+    <Login
+      onGoToRegister={() => navigate("/registro")}
+      onGoToRecover={() => navigate("/recuperar")}
+      onLoginSuccess={() => navigate("/menu")}
+    />
+  );
+}
+
+function RegistroPage() {
+  const navigate = useNavigate();
+
+  return (
+    <Registro
+      onGoToLogin={() => navigate("/")}
+      onGoToTerms={() => navigate("/terminos")}
+    />
+  );
+}
+
+function RecuperarPage() {
+  const navigate = useNavigate();
+
+  return <Recuperar onGoToLogin={() => navigate("/")} />;
+}
+
+function TerminosPage() {
+  const navigate = useNavigate();
+
+  return (
+    <Terminos
+      onGoBack={() => navigate("/registro")}
+      onGoToLogin={() => navigate("/")}
+    />
+  );
+}
+
+function MenuPage() {
+  const navigate = useNavigate();
+
+  return <Menu onLogout={() => navigate("/")} />;
+}
+
+function ProtectedMenuRoute() {
+  const token = localStorage.getItem("token");
+  return token ? <MenuPage /> : <Navigate to="/" replace />;
+}
+
 export default function App() {
-  const [vista, setVista] = useState("login"); // "registro" | "login" | "recuperar" | "menu" | "terminos"
-
-  const irARegistro = () => setVista("registro");
-  const irALogin = () => setVista("login");
-  const irARecuperar = () => setVista("recuperar");
-  const irAMenu = () => setVista("menu");
-  const irATerminos = () => setVista("terminos");
-
   useEffect(() => {
     const token = localStorage.getItem("token");
-    if (token) {
-      setVista("menu");
+    const currentPath = window.location.pathname;
+
+    if (token && (currentPath === "/" || currentPath === "/login")) {
+      window.history.replaceState({}, "", "/menu");
     }
   }, []);
 
-  if (vista === "login") {
-    return (
-      <Login
-        onGoToRegister={irARegistro}
-        onGoToRecover={irARecuperar}
-        onLoginSuccess={irAMenu}
-      />
-    );
-  }
-
-  if (vista === "recuperar") {
-    return <Recuperar onGoToLogin={irALogin} />;
-  }
-
-  if (vista === "registro") {
-    return <Registro onGoToLogin={irALogin} onGoToTerms={irATerminos} />;
-  }
-
-  if (vista === "terminos") {
-    return <Terminos onGoBack={irARegistro} onGoToLogin={irALogin} />;
-  }
-
-  if (vista === "menu") {
-    return <Menu onLogout={irALogin} />;
-  }
-
-  return null;
+  return (
+    <Routes>
+      <Route path="/" element={<LoginPage />} />
+      <Route path="/login" element={<Navigate to="/" replace />} />
+      <Route path="/registro" element={<RegistroPage />} />
+      <Route path="/recuperar" element={<RecuperarPage />} />
+      <Route path="/terminos" element={<TerminosPage />} />
+      <Route path="/menu" element={<ProtectedMenuRoute />} />
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
+  );
 }

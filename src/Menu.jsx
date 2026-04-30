@@ -152,6 +152,20 @@ const secondaryActionStyle = {
   cursor: "pointer",
 };
 
+const termsSidebarLinkStyle = {
+  display: "block",
+  marginTop: "18px",
+  padding: "12px 14px",
+  borderRadius: "12px",
+  border: "1px solid rgba(255,255,255,0.10)",
+  color: "#ffffff",
+  textDecoration: "none",
+  fontWeight: 600,
+  fontSize: "0.95rem",
+  textAlign: "center",
+  background: "rgba(255,255,255,0.04)",
+};
+
 const cardStyle = {
   background: "rgba(8, 18, 45, 0.88)",
   borderRadius: "22px",
@@ -363,6 +377,17 @@ export default function Menu({ onLogout }) {
             Ajustes
           </button>
         </nav>
+        <div style={{ marginTop: "24px" }}>
+          <a
+            href="/terminos"
+            target="_blank"
+            rel="noreferrer"
+            style={termsSidebarLinkStyle}
+            title="Abrir términos y condiciones"
+          >
+            Términos y condiciones
+          </a>
+        </div>
       </aside>
 
       <main className="menu-main">
