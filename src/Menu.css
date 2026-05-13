@@ -1,7 +1,3 @@
-/* ==========================
-   LAYOUT GENERAL
-   ========================== */
-
 .menu-layout {
   display: flex;
   min-height: 100vh;
@@ -577,12 +573,20 @@
 
 .user-field-input {
   border-radius: 8px;
-  border: none;
+  border: 1px solid rgba(255, 255, 255, 0.15);
   outline: none;
   padding: 0.55rem 0.7rem;
-  background: #020617;
+  background: rgba(255, 255, 255, 0.08);
   color: #f9fafb;
   font-size: 0.85rem;
+  transition:
+    border-color 0.2s,
+    background-color 0.2s;
+}
+
+.user-field-input:focus {
+  border-color: #38bdf8;
+  background: rgba(255, 255, 255, 0.12);
 }
 
 .user-form-actions {

@@ -1164,7 +1164,7 @@ ${msg}`);
                   : "Subir imagen y guardar"}
               <input
                 type="file"
-                accept="image/*"
+                accept=".jpg, .jpeg"
                 onChange={handleCreateMapRecord}
                 style={{ display: "none" }}
                 disabled={uploading || savingInstitution}
@@ -1179,6 +1179,16 @@ ${msg}`);
               Limpiar formulario
             </button>
           </div>
+          <p
+            style={{
+              color: "#9ca3af",
+              fontSize: "0.85rem",
+              marginTop: "12px",
+              marginBottom: "0",
+            }}
+          >
+            * Solo se aceptan imágenes con extensión JPG y no PNG.
+          </p>
         </div>
 
         <div style={cardStyle}>
