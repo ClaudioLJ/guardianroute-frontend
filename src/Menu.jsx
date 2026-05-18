@@ -6,6 +6,7 @@ import logoLight from "/Imagenes/Logo-Fondos-Claros.png";
 import defaultMapImage from "/Imagenes/Mapa-Actual.png";
 
 import apiClient from "./api/apiClient";
+import { forgotPassword, resetPassword } from "./api/authService";
 import {
   getSimulacrosHistorialByInstitution,
   getBeaconCatalogByInstitution,
@@ -991,6 +992,24 @@ ${msg}`);
     }
   };
 
+  const handleDeleteBeacon = async (identificador) => {
+    if (!identificador) return;
+    if (!window.confirm(`¿Seguro que deseas eliminar el beacon con identificador: ${identificador}?`)) return;
+
+    try {
+      await apiClient.delete(`/api/admin/instituciones/beacon/identificador/${identificador}`);
+      setBeacons((prev) => prev.filter((b) => b.identificador !== identificador));
+      alert("Beacon eliminado correctamente.");
+    } catch (error) {
+      const msg =
+        error?.response?.data?.message ||
+        error?.response?.data?.error ||
+        error?.message ||
+        "No se pudo eliminar el beacon.";
+      alert(`Error al eliminar beacon:\n${msg}`);
+    }
+  };
+
   const renderTreeNode = (record) => {
     const isSelected = selectedRecordId === record.id;
 
@@ -1494,20 +1513,48 @@ ${msg}`);
                         borderRadius: "14px",
                         padding: "14px",
                         marginBottom: "10px",
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center"
                       }}
                     >
-                      <p style={mapMetaText}>
-                        <strong>{beacon.nombre || "Sin nombre"}</strong>
-                      </p>
-                      <p style={mapMetaText}>
-                        ID: {beacon.identificador || "Sin identificador"}
-                      </p>
-                      <p style={mapMetaText}>
-                        Coordenadas: X {beacon.x} / Y {beacon.y}
-                      </p>
-                      <p style={mapMetaText}>
-                        Estatus: {beacon.estatus || "ACTIVO"}
-                      </p>
+                      <div>
+                        <p style={mapMetaText}>
+                          <strong>{beacon.nombre || "Sin nombre"}</strong>
+                        </p>
+                        <p style={mapMetaText}>
+                          ID: {beacon.identificador || "Sin identificador"}
+                        </p>
+                        <p style={mapMetaText}>
+                          Coordenadas: X {beacon.x} / Y {beacon.y}
+                        </p>
+                        <p style={mapMetaText}>
+                          Estatus: {beacon.estatus || "ACTIVO"}
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteBeacon(beacon.identificador)}
+                        style={{
+                          background: "transparent",
+                          color: "#ff5a5f",
+                          border: "1px solid rgba(255, 90, 95, 0.5)",
+                          padding: "6px 12px",
+                          borderRadius: "8px",
+                          cursor: "pointer",
+                          fontWeight: 600,
+                          fontSize: "0.85rem",
+                          transition: "all 0.2s ease"
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.background = "rgba(255, 90, 95, 0.1)";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.background = "transparent";
+                        }}
+                      >
+                        Eliminar
+                      </button>
                     </div>
                   ))
                 )}
@@ -2572,27 +2619,82 @@ function IncidentesSection() {
 
 function AjustesSection({ theme, setTheme }) {
   const [showPassword, setShowPassword] = useState(false);
-  const [passwordData, setPasswordData] = useState({
-    actual: "",
-    nueva: "",
-    confirmar: "",
-  });
-  const [photoName, setPhotoName] = useState("");
+  
+  const [step, setStep] = useState(1);
+  const [correo, setCorreo] = useState("");
+  const [codigo, setCodigo] = useState("");
+  const [pwd, setPwd] = useState("");
+  const [pwd2, setPwd2] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handlePasswordSubmit = (e) => {
+  const handlePasswordSubmit = async (e) => {
     e.preventDefault();
-    if (!passwordData.nueva || !passwordData.confirmar) {
-      alert("Llena la nueva contraseña y la confirmación.");
-      return;
+    try {
+      setLoading(true);
+
+      if (step === 1) {
+        if (!correo.trim()) {
+          alert("Ingresa tu correo electrónico.");
+          return;
+        }
+        await forgotPassword(correo.trim());
+        alert("Si el correo existe, te enviamos un código.");
+        setStep(2);
+        return;
+      }
+
+      if (step === 2) {
+        if (!codigo.trim()) {
+          alert("Ingresa el código que te llegó al correo.");
+          return;
+        }
+        setStep(3);
+        return;
+      }
+
+      if (step === 3) {
+        if (pwd.length < 6) {
+          alert("La contraseña debe tener al menos 6 caracteres.");
+          return;
+        }
+        if (pwd !== pwd2) {
+          alert("Las contraseñas no coinciden.");
+          return;
+        }
+
+        await resetPassword({
+          correo: correo.trim(),
+          code: codigo.trim(),
+          newPwd: pwd,
+        });
+
+        alert("Contraseña actualizada correctamente.");
+        setStep(1);
+        setCorreo("");
+        setCodigo("");
+        setPwd("");
+        setPwd2("");
+        setShowPassword(false);
+      }
+    } catch (error) {
+      console.error("Error en recuperación:", error);
+      const msg =
+        error?.response?.data?.message ||
+        error?.response?.data?.error ||
+        error?.message ||
+        "Error desconocido";
+      alert(`Ocurrió un error: ${msg}`);
+    } finally {
+      setLoading(false);
     }
-    if (passwordData.nueva !== passwordData.confirmar) {
-      alert("Las contraseñas no coinciden.");
-      return;
-    }
-    alert("Contraseña actualizada (simulación).");
-    setPasswordData({ actual: "", nueva: "", confirmar: "" });
-    setShowPassword(false);
   };
+
+  const primaryButton =
+    step === 1
+      ? "Enviar código"
+      : step === 2
+        ? "Continuar"
+        : "Guardar contraseña";
 
   return (
     <div className="settings-section">
@@ -2602,84 +2704,95 @@ function AjustesSection({ theme, setTheme }) {
           <button
             type="button"
             className="settings-button"
-            onClick={() => setShowPassword((v) => !v)}
+            onClick={() => {
+              setShowPassword((v) => !v);
+              if (!showPassword) {
+                setStep(1);
+                setCorreo("");
+                setCodigo("");
+                setPwd("");
+                setPwd2("");
+              }
+            }}
           >
             Cambiar contraseña
           </button>
           {showPassword && (
             <form className="settings-form" onSubmit={handlePasswordSubmit}>
-              <label className="settings-field-label">
-                Contraseña actual
-                <input
-                  type="password"
-                  className="settings-input"
-                  value={passwordData.actual}
-                  onChange={(e) =>
-                    setPasswordData((p) => ({ ...p, actual: e.target.value }))
-                  }
-                />
-              </label>
-              <label className="settings-field-label">
-                Nueva contraseña
-                <input
-                  type="password"
-                  className="settings-input"
-                  value={passwordData.nueva}
-                  onChange={(e) =>
-                    setPasswordData((p) => ({ ...p, nueva: e.target.value }))
-                  }
-                />
-              </label>
-              <label className="settings-field-label">
-                Confirmar contraseña
-                <input
-                  type="password"
-                  className="settings-input"
-                  value={passwordData.confirmar}
-                  onChange={(e) =>
-                    setPasswordData((p) => ({
-                      ...p,
-                      confirmar: e.target.value,
-                    }))
-                  }
-                />
-              </label>
+              {step === 1 && (
+                <label className="settings-field-label">
+                  Correo Electrónico
+                  <input
+                    type="email"
+                    className="settings-input"
+                    value={correo}
+                    onChange={(e) => setCorreo(e.target.value)}
+                    disabled={loading}
+                    required
+                  />
+                </label>
+              )}
+              {step === 2 && (
+                <label className="settings-field-label">
+                  Código de Verificación
+                  <input
+                    type="text"
+                    className="settings-input"
+                    value={codigo}
+                    onChange={(e) => setCodigo(e.target.value)}
+                    disabled={loading}
+                    required
+                  />
+                </label>
+              )}
+              {step === 3 && (
+                <>
+                  <label className="settings-field-label">
+                    Nueva contraseña
+                    <input
+                      type="password"
+                      className="settings-input"
+                      value={pwd}
+                      onChange={(e) => setPwd(e.target.value)}
+                      disabled={loading}
+                      required
+                    />
+                  </label>
+                  <label className="settings-field-label">
+                    Confirmar contraseña
+                    <input
+                      type="password"
+                      className="settings-input"
+                      value={pwd2}
+                      onChange={(e) => setPwd2(e.target.value)}
+                      disabled={loading}
+                      required
+                    />
+                  </label>
+                </>
+              )}
               <div className="settings-actions">
                 <button
                   type="button"
                   className="settings-button secondary"
-                  onClick={() => setShowPassword(false)}
+                  onClick={() => {
+                    if (step === 1) {
+                      setShowPassword(false);
+                    } else if (step === 2) {
+                      setStep(1);
+                    } else {
+                      setStep(2);
+                    }
+                  }}
+                  disabled={loading}
                 >
-                  Cancelar
+                  {step === 1 ? "Cancelar" : "Volver"}
                 </button>
-                <button type="submit" className="settings-button primary">
-                  Guardar
+                <button type="submit" className="settings-button primary" disabled={loading}>
+                  {loading ? "Procesando..." : primaryButton}
                 </button>
               </div>
             </form>
-          )}
-
-          <button
-            type="button"
-            className="settings-button"
-            onClick={() =>
-              document.getElementById("settings-photo-input")?.click()
-            }
-          >
-            Seleccionar foto de perfil
-          </button>
-          <input
-            id="settings-photo-input"
-            type="file"
-            accept="image/*"
-            style={{ display: "none" }}
-            onChange={(e) => {
-              const file = e.target.files?.[0];
-              if (file) setPhotoName(file.name);
-            }}
-          />
-          {photoName && (
-            <p className="settings-info">Foto seleccionada: {photoName}</p>
           )}
 
           <button
