@@ -61,13 +61,13 @@ export async function startSimulacroTimer(institutionId) {
     institucionId: institutionId,
   };
 
-  await set(ref(database, `simulacro_actual/${institutionId}`), payload);
+  await set(ref(database, `simulacros/${institutionId}`), payload);
 
   return payload;
 }
 
 export async function finishSimulacroTimer(institutionId, extraData = {}) {
-  const currentRef = ref(database, `simulacro_actual/${institutionId}`);
+  const currentRef = ref(database, `simulacros/${institutionId}`);
   const snapshot = await get(currentRef);
 
   if (!snapshot.exists()) {
@@ -98,7 +98,7 @@ export async function finishSimulacroTimer(institutionId, extraData = {}) {
   };
 
   await push(ref(database, `simulacros_historial/${institutionId}`), payload);
-  await remove(currentRef);
+  await set(currentRef, payload);
 
   return payload;
 }
@@ -141,7 +141,7 @@ export async function getSimulacrosHistorialByInstitution(institutionId) {
 }
 
 export async function getCurrentSimulacroStateByInstitution(institutionId) {
-  const rootPath = `simulacro_actual/${institutionId}`;
+  const rootPath = `simulacros/${institutionId}`;
   const snapshot = await get(ref(database, rootPath));
 
   if (!snapshot.exists()) {
